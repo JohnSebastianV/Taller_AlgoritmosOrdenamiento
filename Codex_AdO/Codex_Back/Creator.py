@@ -4,28 +4,28 @@ from Codex_AdO.Codex_Back.Algoritmos_Ordenamiento import Bubble,  Bucket, Counti
 class Creator:
     def __init__(self):
         self.dict_clases = {
-            1: Bubble.BubbleSort(),
-            2: Bucket.BucketSort(),
-            3: Counting.CountingSort(),
+            1: Radix.RadixSort(),
+            2: Merge.MergeSort(),
+            3: Bucket.BucketSort(),
             4: Heap.HeapSort(),
             5: Insertion.InsertionSort(),
-            6: Merge.MergeSort(),
-            7: Quick.QuickSort(),
-            8: Radix.RadixSort(),
-            9: Selection.SelectionSort()
+            6: Quick.QuickSort(),
+            7: Bubble.BubbleSort(),
+            8: Selection.SelectionSort(),
+            9: Counting.CountingSort()
         }
 
     def ordenar(self, num, arr, columna):
         metodo_nombres = {
-            1: "BubbleSort",
-            2: "BucketSort",
-            3: "CountingSort",
+            1: "RadixSort",
+            2: "MergeSort",
+            3: "BucketSort",
             4: "HeapSort",
             5: "InsertionSort",
-            6: "MergeSort",
-            7: "QuickSort",
-            8: "RadixSort",
-            9: "SelectionSort"
+            6: "QuickSort",
+            7: "BubbleSort",
+            8: "SelectionSort",
+            9: "CountingSort"
         }
         clase = self.dict_clases.get(num)
         if clase:
