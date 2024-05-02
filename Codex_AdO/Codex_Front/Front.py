@@ -74,14 +74,16 @@ class MainWindow(QMainWindow):
         self.button_sin_ordenar.clicked.connect(self.mostrar_informacion_sin_ordenar)
 
     def mostrar_informacion_ordenada(self):
-        seleccion_metodo = self.comboBox1.currentText()
-        metodo_elegido = int(seleccion_metodo.split(" - ")[0])
-        columna = self.comboBox2.currentText()
-
         try:
+            seleccion_metodo = self.comboBox1.currentText()
+            metodo_elegido = int(seleccion_metodo.split(" - ")[0])
+            columna = self.comboBox2.currentText()
+
             ruta = "https://www.datos.gov.co/resource/dyy8-9s4r.json"
+
             datos = requests.get(ruta)
-            datos.raise_for_status()  # Si hay un error en la solicitud, levanta una excepción
+            datos.raise_for_status()  # Lanza una excepción si la solicitud no fue exitosa
+
             datos_json = datos.json()
             datos_df = pd.json_normalize(datos_json)
 
@@ -102,17 +104,21 @@ class MainWindow(QMainWindow):
                 QMessageBox.information(self, "Información", mensaje)
 
         except requests.exceptions.RequestException as e:
-            mensaje_error = "No se puede acceder al API. Por favor, verifica tu conexión a Internet."
-            QMessageBox.warning(self, "Error", mensaje_error)
-            print(f"Error al acceder al API: {e}")
+            # Manejar el error cuando no hay conexión a Internet
+            QMessageBox.critical(self, "Error", "No hay conexión a Internet. No se puede consumir el API.")
+        except Exception as e:
+            # Manejar otros errores genéricos
+            QMessageBox.critical(self, "Error", f"Error: {str(e)}")
 
     def mostrar_informacion_sin_ordenar(self):
-        columnas = ["edad", "hombres", "mujeres"]
-
         try:
+            columnas = ["edad", "hombres", "mujeres"]
+
             ruta = "https://www.datos.gov.co/resource/dyy8-9s4r.json"
+
             datos = requests.get(ruta)
-            datos.raise_for_status()  # Si hay un error en la solicitud, levanta una excepción
+            datos.raise_for_status()  # Lanza una excepción si la solicitud no fue exitosa
+
             datos_json = datos.json()
             datos_df = pd.json_normalize(datos_json)
 
@@ -122,9 +128,11 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, "Información", mensaje)
 
         except requests.exceptions.RequestException as e:
-            mensaje_error = "No se puede acceder al API. Por favor, verifica tu conexión a Internet."
-            QMessageBox.warning(self, "Error", mensaje_error)
-            print(f"Error al acceder al API: {e}")
+            # Manejar el error cuando no hay conexión a Internet
+            QMessageBox.critical(self, "Error", "No hay conexión a Internet. No se puede consumir el API.")
+        except Exception as e:
+            # Manejar otros errores genéricos
+            QMessageBox.critical(self, "Error", f"Error: {str(e)}")
 
     def mostrar_tabla(self, df, mensaje):
         self.table.clear()
@@ -135,6 +143,7 @@ class MainWindow(QMainWindow):
             for j in range(len(df.columns)):
                 item = QTableWidgetItem(str(df.iloc[i, j]))
                 self.table.setItem(i, j, item)
+
 
 
 
