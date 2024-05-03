@@ -1,7 +1,7 @@
-from Codex_AdO.Codex_Back import MetodoOrdenamiento
+from Codex_AdO.Codex_Back import OrderingMethod
 
 
-class InsertionSort(MetodoOrdenamiento.MetodoOrdenamiento):
+class InsertionSort(OrderingMethod.OrderingMethod):
     @staticmethod
     def sort(arr):
         for i in range(1, len(arr)):

@@ -1,7 +1,7 @@
-from Codex_AdO.Codex_Back import MetodoOrdenamiento
+from Codex_AdO.Codex_Back import OrderingMethod
 
 
-class QuickSort(MetodoOrdenamiento.MetodoOrdenamiento):
+class QuickSort(OrderingMethod.OrderingMethod):
     @staticmethod
     def sort(arr):
         if len(arr) <= 1:

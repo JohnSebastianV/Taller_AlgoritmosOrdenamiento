@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class MetodoOrdenamiento(ABC):
+class OrderingMethod(ABC):
     @staticmethod
     @abstractmethod
     def sort(arr: list) -> list:

@@ -1,8 +1,7 @@
-class Usuario:
+class User:
     @staticmethod
-    def obtener_metodo_ordenamiento(metodo_elegido):
-        if metodo_elegido < 1 or metodo_elegido > 9:
+    def get_sort_method(method):
+        if method < 1 or method > 9:
             print("Número de método de ordenamiento inválido. Debe estar entre 1 y 9.")
             return None
-        return metodo_elegido
-
+        return method
