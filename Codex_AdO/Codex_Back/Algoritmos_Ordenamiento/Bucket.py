@@ -1,7 +1,7 @@
-from Codex_AdO.Codex_Back import MetodoOrdenamiento
+from Codex_AdO.Codex_Back import OrderingMethod
 
 
-class BucketSort(MetodoOrdenamiento.MetodoOrdenamiento):
+class BucketSort(OrderingMethod.OrderingMethod):
     @staticmethod
     def sort(arr):
         max_value = max(arr)
