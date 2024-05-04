@@ -1,6 +1,6 @@
-from PySide2.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QComboBox, QPushButton, \
+from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QComboBox, QPushButton, \
     QTableWidget, QTableWidgetItem, QHBoxLayout, QMessageBox
-from PySide2.QtGui import QFont
+from PySide6.QtGui import QFont
 from Codex_AdO.Codex_Back import Creator, User
 import pandas as pd
 import requests
