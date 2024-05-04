@@ -83,9 +83,8 @@ class MainWindow(QMainWindow):
 
     def ordered_information(self):
         try:
-            selectedmethods = self.comboBox1.currentText()
-            chosenmethod = int(selectedmethods.split(" - ")[0])
-            column = self.comboBox2.currentText()
+            selected_methods = self.comboBox1.currentText()
+            chosen_method = int(selected_methods.split(" - ")[0])
 
             route = "https://www.datos.gov.co/resource/dyy8-9s4r.json"
 
@@ -95,26 +94,35 @@ class MainWindow(QMainWindow):
             data_json = data.json()
             data_df = pd.json_normalize(data_json)
 
-            methodname = selectedmethods.split(" - ")[1]
-            method = User.User.get_sort_method(chosenmethod)
+            method_name = selected_methods.split(" - ")[1]
+            method = User.User.get_sort_method(chosen_method)
             if method is not None:
                 creator = Creator.Creator()
 
-                ordering = data_df[column].astype(int)
-                arrayordering = creator.method_order(chosenmethod, ordering, column)[0]
+                # Seleccionar la columna a ordenar
+                column_to_sort = self.comboBox2.currentText()
 
-                data_df[column] = arrayordering
-                data_df.sort_values(by=column, inplace=True)
+                # Convertir todas las columnas relevantes a tipos numéricos si es posible
+                relevant_columns = ["edad", "mujeres", "hombres"]
+                for col in relevant_columns:
+                    data_df[col] = pd.to_numeric(data_df[col], errors='coerce')
 
-                message = f"Se mostró la información ordenada de la columna {column} utilizando el método {methodname}"
+                # Ordenar los valores de la columna seleccionada y mantener el orden relativo de las filas
+                sorted_indices = data_df.sort_values(by=column_to_sort).index
+
+                # Aplicar el mismo orden a todo el DataFrame
+                data_df = data_df.loc[sorted_indices]
+
+                # Mostrar el DataFrame ordenado en la tabla
                 self.show_table(data_df)
 
+                message = f"Se mostró la información ordenada de la columna {column_to_sort} utilizando el método {method_name}"
                 QMessageBox.information(self, "Información", message)
 
-        except requests.exceptions.RequestException:
-            QMessageBox.critical(self, "Error", "No hay conexión a Internet. No se puede consumir el API.")
+        except requests.exceptions.RequestException as e:
+            QMessageBox.critical(self, "Error", f"Error al hacer la solicitud: {str(e)}")
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Error: {str(e)}")
+            QMessageBox.critical(self, "Error", f"Error inesperado: {str(e)}")
 
     def information_without_order(self):
         try:
@@ -153,8 +161,14 @@ class MainWindow(QMainWindow):
 
             creator = Creator.Creator()
 
-            for column in ["edad", "hombres", "mujeres"]:
-                column_values = data_df[column].astype(int).tolist()
+            relevant_columns = ["edad", "hombres", "mujeres"]
+
+            for column in relevant_columns:
+                # Convertir la columna a tipo numérico si es posible
+                data_df[column] = pd.to_numeric(data_df[column], errors='coerce')
+
+            for column in relevant_columns:
+                column_values = data_df[column].dropna().tolist()  # Eliminar NaNs antes de ordenar
                 method_index = int(selected_method.split(" - ")[0])
                 ordered_values, _ = creator.method_order(method_index, column_values, column)
                 data_df[column] = ordered_values
