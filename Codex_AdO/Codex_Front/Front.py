@@ -40,9 +40,8 @@ class MainWindow(QMainWindow):
         left_layout.addWidget(self.label2)
 
         self.comboBox2 = QComboBox()
-        self.comboBox2.addItem("mujeres")
-        self.comboBox2.addItem("hombres")
-        self.comboBox2.addItem("edad")
+        self.comboBox2.addItem("vehiculos")
+        self.comboBox2.addItem("pasajeros")
         self.comboBox2.setFont(QFont("Arial", 12))
         left_layout.addWidget(self.comboBox2)
 
@@ -86,7 +85,7 @@ class MainWindow(QMainWindow):
             selected_methods = self.comboBox1.currentText()
             chosen_method = int(selected_methods.split(" - ")[0])
 
-            route = "https://www.datos.gov.co/resource/dyy8-9s4r.json"
+            route = "https://www.datos.gov.co/resource/aesn-q83n.json"
 
             data = requests.get(route)
             data.raise_for_status()
@@ -103,7 +102,7 @@ class MainWindow(QMainWindow):
                 column_to_sort = self.comboBox2.currentText()
 
                 # Convertir todas las columnas relevantes a tipos numéricos si es posible
-                relevant_columns = ["edad", "mujeres", "hombres"]
+                relevant_columns = ["vehiculos", "pasajeros"]
                 for col in relevant_columns:
                     data_df[col] = pd.to_numeric(data_df[col], errors='coerce')
 
@@ -126,9 +125,9 @@ class MainWindow(QMainWindow):
 
     def information_without_order(self):
         try:
-            columnas = ["edad", "hombres", "mujeres"]
+            columnas = ["vehiculos", "pasajeros", "lugar", "estado", "mes", "a_o"]
 
-            route = "https://www.datos.gov.co/resource/dyy8-9s4r.json"
+            route = "https://www.datos.gov.co/resource/aesn-q83n.json"
 
             data = requests.get(route)
             data.raise_for_status()
@@ -151,7 +150,7 @@ class MainWindow(QMainWindow):
             selected_method = self.comboBox1.currentText()
             method_name = selected_method.split(" - ")[1]
 
-            route = "https://www.datos.gov.co/resource/dyy8-9s4r.json"
+            route = "https://www.datos.gov.co/resource/aesn-q83n.json"
 
             data = requests.get(route)
             data.raise_for_status()
@@ -161,7 +160,7 @@ class MainWindow(QMainWindow):
 
             creator = Creator.Creator()
 
-            relevant_columns = ["edad", "hombres", "mujeres"]
+            relevant_columns = ["vehiculos", "pasajeros"]
 
             for column in relevant_columns:
                 # Convertir la columna a tipo numérico si es posible
