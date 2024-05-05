@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QLabel, QComboBox, QPushButton, \
-    QTableWidget, QTableWidgetItem, QHBoxLayout, QMessageBox
+    QTableWidget, QTableWidgetItem, QHBoxLayout, QMessageBox, QSizePolicy
 from PySide6.QtGui import QFont
 from Codex_AdO.Codex_Back import Creator, User
 import pandas as pd
@@ -9,12 +9,13 @@ import requests
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Ordenamiento de Datos")
+        self.setWindowTitle("Ordenamiento de Datos: Llegadas y salidas por tierra Medellin 2020-2023")
         self.setStyleSheet("background-color: #add8e6;")
 
         main_layout = QHBoxLayout()
 
-        left_layout = QVBoxLayout()
+        left_widget = QWidget()
+        left_layout = QVBoxLayout(left_widget)
 
         self.label1 = QLabel("Seleccione el método de ordenamiento:")
         self.label1.setFont(QFont("Arial", 12))
@@ -32,6 +33,7 @@ class MainWindow(QMainWindow):
         self.comboBox1.addItem("8 - SelectionSort")
         self.comboBox1.addItem("9 - CountingSort")
         self.comboBox1.setFont(QFont("Arial", 12))
+        self.comboBox1.setStyleSheet("color: #333")
         left_layout.addWidget(self.comboBox1)
 
         self.label2 = QLabel("Seleccione la columna:")
@@ -43,6 +45,7 @@ class MainWindow(QMainWindow):
         self.comboBox2.addItem("vehiculos")
         self.comboBox2.addItem("pasajeros")
         self.comboBox2.setFont(QFont("Arial", 12))
+        self.comboBox2.setStyleSheet("color: #333")
         left_layout.addWidget(self.comboBox2)
 
         self.button_sort = QPushButton("Mostrar Información Ordenada")
@@ -59,16 +62,13 @@ class MainWindow(QMainWindow):
             "border-radius: 5px;")
         left_layout.addWidget(self.button_not_sort)
 
-        self.button_sort_all = QPushButton("Ordenar Todas")
-        self.button_sort_all.setFont(QFont("Arial", 12))
-        self.button_sort_all.setStyleSheet(
-            "background-color: #FFA500; color: white; border: none; padding: 10px 24px; cursor: pointer; "
-            "border-radius: 5px;")
-        left_layout.addWidget(self.button_sort_all)
+        left_widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        left_widget.setMaximumWidth(300)
 
-        main_layout.addLayout(left_layout)
+        main_layout.addWidget(left_widget)
 
         self.table = QTableWidget()
+        self.table.setStyleSheet("color: black;")
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         main_layout.addWidget(self.table)
 
@@ -78,7 +78,6 @@ class MainWindow(QMainWindow):
 
         self.button_sort.clicked.connect(self.ordered_information)
         self.button_not_sort.clicked.connect(self.information_without_order)
-        self.button_sort_all.clicked.connect(self.sort_all_columns)
 
     def ordered_information(self):
         try:
@@ -96,26 +95,22 @@ class MainWindow(QMainWindow):
             method_name = selected_methods.split(" - ")[1]
             method = User.User.get_sort_method(chosen_method)
             if method is not None:
-                creator = Creator.Creator()
+                Creator.Creator()
 
-                # Seleccionar la columna a ordenar
                 column_to_sort = self.comboBox2.currentText()
 
-                # Convertir todas las columnas relevantes a tipos numéricos si es posible
                 relevant_columns = ["vehiculos", "pasajeros"]
                 for col in relevant_columns:
                     data_df[col] = pd.to_numeric(data_df[col], errors='coerce')
 
-                # Ordenar los valores de la columna seleccionada y mantener el orden relativo de las filas
                 sorted_indices = data_df.sort_values(by=column_to_sort).index
 
-                # Aplicar el mismo orden a todo el DataFrame
                 data_df = data_df.loc[sorted_indices]
 
-                # Mostrar el DataFrame ordenado en la tabla
                 self.show_table(data_df)
 
-                message = f"Se mostró la información ordenada de la columna {column_to_sort} utilizando el método {method_name}"
+                message = (f"Se mostró la información ordenada de la columna {column_to_sort} "
+                           f"utilizando el método {method_name}")
                 QMessageBox.information(self, "Información", message)
 
         except requests.exceptions.RequestException as e:
@@ -125,7 +120,7 @@ class MainWindow(QMainWindow):
 
     def information_without_order(self):
         try:
-            columnas = ["vehiculos", "pasajeros", "lugar", "estado", "mes", "a_o"]
+            columns = ["a_o", "mes", "estado", "lugar", "vehiculos", "pasajeros"]
 
             route = "https://www.datos.gov.co/resource/aesn-q83n.json"
 
@@ -136,45 +131,8 @@ class MainWindow(QMainWindow):
             data_df = pd.json_normalize(data_json)
 
             message = "Se mostró la información sin ordenar de todas las columnas."
-            self.show_table(data_df[columnas])
+            self.show_table(data_df[columns])
 
-            QMessageBox.information(self, "Información", message)
-
-        except requests.exceptions.RequestException:
-            QMessageBox.critical(self, "Error", "No hay conexión a Internet. No se puede consumir el API.")
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Error: {str(e)}")
-
-    def sort_all_columns(self):
-        try:
-            selected_method = self.comboBox1.currentText()
-            method_name = selected_method.split(" - ")[1]
-
-            route = "https://www.datos.gov.co/resource/aesn-q83n.json"
-
-            data = requests.get(route)
-            data.raise_for_status()
-
-            data_json = data.json()
-            data_df = pd.json_normalize(data_json)
-
-            creator = Creator.Creator()
-
-            relevant_columns = ["vehiculos", "pasajeros"]
-
-            for column in relevant_columns:
-                # Convertir la columna a tipo numérico si es posible
-                data_df[column] = pd.to_numeric(data_df[column], errors='coerce')
-
-            for column in relevant_columns:
-                column_values = data_df[column].dropna().tolist()  # Eliminar NaNs antes de ordenar
-                method_index = int(selected_method.split(" - ")[0])
-                ordered_values, _ = creator.method_order(method_index, column_values, column)
-                data_df[column] = ordered_values
-
-            self.show_table(data_df)
-
-            message = f"Se mostró la información ordenada de todas las columnas utilizando el método {method_name}."
             QMessageBox.information(self, "Información", message)
 
         except requests.exceptions.RequestException:

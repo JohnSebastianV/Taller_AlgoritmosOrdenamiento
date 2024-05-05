@@ -16,7 +16,7 @@ class Creator:
             9: Counting.CountingSort()
         }
 
-    def method_order(self, num, arr, column):
+    def method_order(self, num, arr, column): # compeljidad temporal O(n^2), complejidad espacial O(n^2)
         dictionarynames = {
             1: "RadixSort",
             2: "MergeSort",
